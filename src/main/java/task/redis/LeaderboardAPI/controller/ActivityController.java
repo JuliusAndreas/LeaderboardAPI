@@ -13,11 +13,18 @@ public class ActivityController {
 
     @PatchMapping("/activity")
     public ResponseEntity activity(@RequestHeader("username") String username, @RequestParam("number") Integer number) {
+        if (usernameIsInvalid(username)) {
+            return ResponseEntity.badRequest().build();
+        }
         if (number == 1) {
             activityService.userEvaluate(username, AnswerStatus.CORRECT);
         } else {
             activityService.userEvaluate(username, AnswerStatus.WRONG);
         }
         return ResponseEntity.ok().build();
+    }
+
+    public boolean usernameIsInvalid(String username) {
+        return username == null || username.isEmpty() || username.isBlank();
     }
 }
