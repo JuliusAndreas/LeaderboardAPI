@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.TypedJsonJacksonCodec;
 import org.springframework.stereotype.Service;
 import task.redis.LeaderboardAPI.util.AnswerStatus;
 
@@ -24,7 +25,8 @@ public class ActivityService {
                 .evictionPolicy(LocalCachedMapOptions.EvictionPolicy.LRU)
                 .maxIdle(10, TimeUnit.SECONDS)
                 .timeToLive(60, TimeUnit.SECONDS);
-        leaderboard = redis.getLocalCachedMap(leaderboardKey, options);
+        leaderboard = redis.getLocalCachedMap(leaderboardKey, new TypedJsonJacksonCodec(String.class) ,options);
+        leaderboard.clear();
     }
 
     public void userEvaluate(String username, AnswerStatus answerStatus) {
