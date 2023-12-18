@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.LocalCachedMapOptions;
+import org.redisson.api.RLock;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.TypedJsonJacksonCodec;
@@ -24,8 +25,8 @@ public class ActivityService {
     private final RedissonClient redis;
     private RMap<String, Integer> leaderboard;
     public String leaderboardKey = "leaderboard";
-    final static String outputFilePath
-            = "./leaderboard.txt";
+    private final static String outputFilePath = "./leaderboard.txt";
+    private boolean isWrittenToFile = false;
 
     @PostConstruct
     public void init() {
@@ -48,11 +49,14 @@ public class ActivityService {
 
     @Scheduled(initialDelay = 30, fixedDelay = 60, timeUnit = TimeUnit.SECONDS)
     public void releaseLock() {
-
+        isWrittenToFile = true;
     }
 
     @Scheduled(fixedDelay = 60, timeUnit = TimeUnit.SECONDS)
     public void writeToFile() {
+        RLock lock = redis.getFairLock("lock");
+        lock.lock();
+        if (isWrittenToFile) return;
         File file = new File(outputFilePath);
         try (BufferedWriter bf = new BufferedWriter(new FileWriter(file))) {
             for (RMap.Entry<String, Integer> entry : leaderboard.entrySet()) {
@@ -64,6 +68,8 @@ public class ActivityService {
         } catch (IOException e) {
             log.error("Error encountered while trying to write to the file", e);
         }
+        isWrittenToFile = true;
+        lock.unlock();
     }
 
 }
