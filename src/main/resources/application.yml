@@ -1,0 +1,22 @@
+redis:
+  cluster:
+    host: "redis://127.0.0.1:"
+    nodes-ports:
+      slave-1: 6380
+      slave-2: 6383
+      slave-3: 6384
+      master-1: 6381
+      master-2: 6382
+      master-3: 6385
+    scan-interval: 200
+  single:
+    host: "redis://127.0.0.1:"
+    port: 6379
+
+rate:
+  limit:
+    count: 2
+    duration: 10
+    key: "myRateLimiter"
+
+
