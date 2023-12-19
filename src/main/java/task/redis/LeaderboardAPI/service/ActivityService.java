@@ -49,11 +49,12 @@ public class ActivityService {
 
     @Scheduled(initialDelay = 30, fixedDelay = 60, timeUnit = TimeUnit.SECONDS)
     public void releaseLock() {
-        isWrittenToFile = true;
+        isWrittenToFile = false;
     }
 
     @Scheduled(fixedDelay = 60, timeUnit = TimeUnit.SECONDS)
     public void writeToFile() {
+        redis.getKeys().delete("lock");
         RLock lock = redis.getFairLock("lock");
         lock.lock();
         if (isWrittenToFile) return;

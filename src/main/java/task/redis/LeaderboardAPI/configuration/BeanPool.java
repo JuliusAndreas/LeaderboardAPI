@@ -3,11 +3,13 @@ package task.redis.LeaderboardAPI.configuration;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.redisson.Redisson;
+import org.redisson.api.RKeys;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.ClusterServersConfig;
 import org.redisson.config.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 //@Data
 @Configuration
