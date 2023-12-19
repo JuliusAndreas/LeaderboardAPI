@@ -1,6 +1,7 @@
 package task.redis.LeaderboardAPI.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RRateLimiter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,13 @@ import task.redis.LeaderboardAPI.util.AnswerStatus;
 @RequiredArgsConstructor
 public class ActivityController {
     private final ActivityService activityService;
+    private final RRateLimiter rateLimiter;
 
     @PatchMapping("/activity")
     public ResponseEntity activity(@RequestHeader("username") String username, @RequestParam("number") Integer number) {
+        if (!rateLimiter.tryAcquire()) {
+            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
+        }
         if (usernameIsInvalid(username)) {
             return new ResponseEntity("Failure", HttpStatus.BAD_REQUEST);
         }

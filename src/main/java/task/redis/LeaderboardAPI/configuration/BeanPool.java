@@ -18,7 +18,7 @@ public class BeanPool {
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useSingleServer().setAddress(redisConfig.getHost().concat(redisConfig.getPort()));
+        config.useSingleServer().setAddress(redisConfig.getHost().concat(redisConfig.getPort())).setTimeout(10000);
         return Redisson.create(config);
     }
 }
