@@ -13,4 +13,10 @@ redis:
     host: "redis://127.0.0.1:"
     port: 6379
 
+rate:
+  limit:
+    count: 2
+    duration: 10
+    key: "myRateLimiter"
+
 
